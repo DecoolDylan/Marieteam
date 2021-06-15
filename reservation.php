@@ -7,7 +7,7 @@
 
         if(isset($_POST['choix'])){
           $infosReservation = preg_split("/;/", $_POST['choix']);
-
+          //var_dump($infosReservation);
           function date_verif($d1)
 {
             setlocale(LC_TIME, ['fr', 'fra', 'fr_FR']);
@@ -96,24 +96,34 @@
                   </thead>
                   <tbody>
                   <?Php
-                  $a = date_verif($infosReservation[4]);
-          
-                             // $placeReserveAdulte = get_bdd()->query('SELECT libelle, SUM(quantiteAdulte),SUM(quantiteJunior), SUM(quantiteEnfant), SUM(quantiteVoitureInf4m),SUM(quantiteVoitureInf5m),SUM(quantiteFourgon),SUM(quantiteCampingCar),SUM(quantiteCamion) FROM reservation WHERE num_traversee="'.$infosReservation[1].'"')->fetch();
+                  $dateDebut = date_verif($infosReservation[4]);
+                  $date = $infosReservation[4];
+                  $aa = $infosReservation[1];
 
-                              $req2 = get_bdd()->query("SELECT * FROM tarifer WHERE dateDeb='$a'");
-                              while ($donnees1 = $req2->fetch()){
-                                //var_dump($donnees1);
-                                $aa = $donnees1['num_type'];
-                                $req3 = get_bdd()->query("SELECT * FROM type WHERE num_type='$aa'")->fetch();
+                  $req = get_bdd()->query("SELECT dateFin FROM periode");
+
+
+                  
+               
+                             // $placeReserveAdulte = get_bdd()->query('SELECT libelle, SUM(quantiteAdulte),SUM(quantiteJunior), SUM(quantiteEnfant), SUM(quantiteVoitureInf4m),SUM(quantiteVoitureInf5m),SUM(quantiteFourgon),SUM(quantiteCampingCar),SUM(quantiteCamion) FROM reservation WHERE num_traversee="'.$infosReservation[1].'"')->fetch();
+                  $idLiaison = get_bdd()->query("SELECT code_liaison FROM traversee WHERE num_traversee = '$aa'")->fetch();
+
+                  $req2 = get_bdd()->query("SELECT * FROM tarifer INNER JOIN traversee where traversee.code_liaison = tarifer.code_liaison AND dateDeb='$dateDebut' AND tarifer.code_liaison='$idLiaison[0]' AND date='$date'");
+                  $nb = 0;
+                  while ($donnees1 = $req2->fetch()){
+                    $nb++;
+                              //var_dump($req2);
+                                
+                                //$req3 = get_bdd()->query("SELECT * FROM type WHERE num_type='$aa' ")->fetch();
                                 //var_dump($req3);
 
                                 
 ?>
                   <tr>
-                      <td><?php echo $req3['libelle']; ?> </td>
+                      <td><?php //echo $donnees1['libelle']; ?> </td>
                       <td><?php echo $donnees1['tarif']; ?></td>
                       <td>
-                        <select class="form-control" id="" name="<?php echo $req3['num_type']; ?>">
+                        <select class="form-control" id="" name="<?php echo $nb; ?>">
                           <option value="<?php echo "0;".$donnees1['tarif']; ?>" active>0</option>
                           <?php
                           for($i = 1;$i <= 50;$i++){
@@ -127,7 +137,7 @@
                         </select>
                       </td>
                     </tr>
-<?php
+<?php 
                               }
                   ?>
                   
